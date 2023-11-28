@@ -1,7 +1,7 @@
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
-import Notiflix, { Notify } from 'notiflix';
+import Notiflix, { Notify }  from 'notiflix';
 
 const text = document.querySelector('#datetime-picker');
 const startBtn = document.querySelector('button[data-start]');
@@ -59,11 +59,13 @@ startBtn.addEventListener('click', () => {
             seconds.textContent = addLeadingZero(timeElements.seconds);
 
             if (countdown <= 10000) {
-                Notiflix.Notify.success("Odliczanie rozpoczęte!");
+                timer.style.color = 'tomato';
             }
         } else {
-            Notiflix.Notify.success("Odliczanie zakończone");
+            Notiflix.Notify.success('Odliczanie zakończone');
+            timer.style.color = 'black';
             clearInterval(timeTimer);
         }
     }, 1000)
 });
+
