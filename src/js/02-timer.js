@@ -29,7 +29,7 @@ const options = {
       }
     },
 };
-flatpickr(text, options);
+const picker = flatpickr(text, options);
 
 function convertMs(ms) {
     const second = 1000;
@@ -55,7 +55,7 @@ function addLeadingZero(value) {
     startBtn.disabled = true;
     text.disabled = true;
     timer = setInterval(() => { 
-      const countdown = new Date(text.value); - Date.now();
+        const countdown = picker.selectedDates[0] - Date.now();
       const { days, hours, minutes, seconds } = convertMs(countdown);
   
       day.textContent = addLeadingZero(days);
@@ -66,7 +66,8 @@ function addLeadingZero(value) {
       if (countdown <= 1000) {
         spans.forEach(item => item.classList.toggle('end'));
         clearInterval(timer);
-        text.disabled = false;
+          text.disabled = false;
+          Notiflix.Notify.success("The countdown is over!");
       }
     }, 1000);
 };
