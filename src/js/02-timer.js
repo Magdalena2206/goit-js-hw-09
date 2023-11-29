@@ -1,17 +1,18 @@
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
-import Notiflix, { Notify }  from 'notiflix';
+import Notiflix from 'notiflix';
 
 const text = document.querySelector('#datetime-picker');
 const startBtn = document.querySelector('button[data-start]');
-const timer = document.querySelector('timer');
-const days = document.querySelector('span[data-days]');
-const hours = document.querySelector('span[data-hours]');
-const minutes = document.querySelector('span[data-minutes]');
-const seconds = document.querySelector('span[data-seconds]');
+const day = document.querySelector('[data-days]');
+const hour = document.querySelector('[data-hours]');
+const minute = document.querySelector('[data-minutes]');
+const second = document.querySelector('[data-seconds]');
+const spans = document.querySelectorAll('.value');
 
 startBtn.disabled = true;
+let timer = null;
 
 const options = {
     enableTime: true,
@@ -19,21 +20,22 @@ const options = {
     defaultDate: new Date(),
     minuteIncrement: 1,
     onClose(selectedDates) {
-        if (selectedDates[0] < new Date()) {
-            Notiflix.Notify.failure("Proszę wybierz inną datę");
-            startBtn.disabled = true;
-        } else {
-            startBtn.disabled = false;
-        }
-    }
+      if (selectedDates[0] <= Date.now()) {
+        Notiflix.Notify.failure('Please choose a date in the future');
+        startBtn.disabled = true;
+      } else {
+        startBtn.disabled = false;
+  
+      }
+    },
 };
 flatpickr(text, options);
 
 function convertMs(ms) {
-    const day = hour * 24;
-    const hour = minute * 60;
-    const minute = second * 60;
     const second = 1000;
+    const minute = second * 60;
+    const hour = minute * 60;
+    const day = hour * 24;
 
     const days = Math.floor(ms / day);
     const hours = Math.floor((ms % day) / hour);
@@ -44,28 +46,32 @@ function convertMs(ms) {
 }
 
 function addLeadingZero(value) {
-    return value.toString().padStart(2, '0');
-}
+    return `${value}`.padStart(2, '0');
+}  
+  startBtn.addEventListener('click', onBtnStartClick);
+  
+  function onBtnStartClick() {
+    spans.forEach(item => item.classList.toggle('end'));
+    startBtn.disabled = true;
+    text.disabled = true;
+    timer = setInterval(() => { 
+      const countdown = new Date(text.value); - Date.now();
+      const { days, hours, minutes, seconds } = convertMs(countdown);
+  
+      day.textContent = addLeadingZero(days);
+      hour.textContent = addLeadingZero(hours);
+      minute.textContent = addLeadingZero(minutes);
+      second.textContent = addLeadingZero(seconds);
+  
+      if (countdown <= 1000) {
+        spans.forEach(item => item.classList.toggle('end'));
+        clearInterval(timer);
+        text.disabled = false;
+      }
+    }, 1000);
+};
 
-startBtn.addEventListener('click', () => {
-    let timeTimer = setInterval(() => {
-        let countdown = new Date(text.value) - new Date();
-        startBtn.disabled = true;
-        if (countdown >= 0) {
-            let timeElements = convertMs(countdown);
-            days.textContent = addLeadingZero(timeElements.days);
-            hours.textContent = addLeadingZero(timeElements.hours);
-            minutes.textContent = addLeadingZero(timeElements.minutes);
-            seconds.textContent = addLeadingZero(timeElements.seconds);
 
-            if (countdown <= 10000) {
-                timer.style.color = 'tomato';
-            }
-        } else {
-            Notiflix.Notify.success('Odliczanie zakończone');
-            timer.style.color = 'black';
-            clearInterval(timeTimer);
-        }
-    }, 1000)
-});
+
+
 
